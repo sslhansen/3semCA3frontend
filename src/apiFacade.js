@@ -1,4 +1,4 @@
-const URL = "http://localhost:8080/jpareststarter";
+import URL from "./settings.js"
 
 function handleHttpErrors(res) {
     if (! res.ok) {
@@ -33,9 +33,14 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
             setToken(res.token)
         })
     }
-    const fetchData = () => {
+    const fetchDataUser = () => {
         const options = makeOptions("GET", true); // True add's the token
         return fetch(URL + "/api/info/user", options).then(handleHttpErrors);
+    }
+
+    const fetchDataAdmin = () => {
+        const options = makeOptions("GET", true); // True add's the token
+        return fetch(URL + "/api/info/admin", options).then(handleHttpErrors);
     }
     const makeOptions = (method, addToken, body) => {
         var opts = {
@@ -53,6 +58,13 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
         }
         return opts;
     }
+
+    const fetchExternData = () => {
+        const options = makeOptions("GET", true); // True add's the token
+        return fetch(URL + "/api/info/lol", options).then(handleHttpErrors);
+    }
+
+
     return {
         makeOptions,
         setToken,
@@ -60,7 +72,9 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
         loggedIn,
         login,
         logout,
-        fetchData
+        fetchDataUser,
+        fetchDataAdmin,
+        fetchExternData
     }
 }
 const loginFacade = apiFacade();

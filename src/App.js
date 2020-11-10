@@ -1,6 +1,6 @@
 import './App.css';
-import React, {useState, useEffect} from "react";
-import loginFacade from "./apiFacade.js"
+import React, { useState, useEffect } from "react";
+import DoLogin from "./login.js"
 import {
     BrowserRouter as Router,
     Switch,
@@ -13,31 +13,33 @@ import {
     useLocation,
     useHistory
 } from "react-router-dom";
+import loginFacade from './apiFacade';
 
 function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setLoggedIn] = useState(false)
     let history = useHistory();
-
     const setLoginStatus = status => {
-        setIsLoggedIn(status);
+        setLoggedIn(status);
         history.push("/");
     }
     return (
         <div>
             <Header loginMsg={
-                    isLoggedIn ? "Logout" : "Login"
-                }
-                isLoggedIn={isLoggedIn}/>
+                isLoggedIn ? "Logout" : "Login"
+            }
+                isLoggedIn={isLoggedIn} />
             <Switch>
                 <Route exact path="/">
-                    <Home/>
+                    <Home />
                 </Route>
                 <Route exact path="/login">
-                    <DoLogin setLoginStatus={setLoginStatus}
-                        isLoggedIn={isLoggedIn}/>
+                    <DoLogin loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />
+                </Route>
+                <Route exact path="/externData">
+                    <ExternData />
                 </Route>
                 <Route>
-                    <NoMatch/>
+                    <NoMatch />
                 </Route>
             </Switch>
         </div>
@@ -45,114 +47,81 @@ function App() {
     );
 }
 
-function Header({isLoggedIn, loginMsg}) {
+function Header({ isLoggedIn, loginMsg }) {
     return (
         <ul className="header">
             <li>
                 <NavLink exact activeClassName="active" to="/">Home</NavLink>
             </li>
             <li>
-                <NavLink activeClassName="active" to="/jokes">Jokes</NavLink>
+                <NavLink activeClassName="active" to="/externData">Extern API</NavLink>
             </li>
             <li>
-                <NavLink activeClassName="active" to="/scrape">Scrape</NavLink>
+                <NavLink activeClassName="active" to="/login">
+                    {loginMsg}</NavLink>
             </li>
-            <li>
-                <li>
-                    <NavLink activeClassName="active" to="/login">
-                        {loginMsg}</NavLink>
-                </li>
-            </li>
+
         </ul>
 
     )
 }
 
-function DoLogin({setLoginStatus, isLoggedIn}) {
-    const [loggedIn, setLoggedIn] = useState(false)
-    const [errorMsg, setErrorMsg] = useState('');
-
-    const logout = () => {
-        loginFacade.logout()
-        setLoggedIn(false)
-        setErrorMsg('')
-        setLoginStatus(!isLoggedIn)
-    }
-    const login = (user, pass) => {
-
-
-        loginFacade.login(user, pass).then(res => setLoggedIn(true)).catch(err => {
-            if (err.status) {
-                err.fullError.then(e => setErrorMsg(e.message));
-            }
-        }).then(setLoginStatus(!isLoggedIn));
-
-    }
-
-    return (
-        <div> {
-            !loggedIn ? (
-                <div><LogIn login={login}/><p>{errorMsg}</p>
-                </div>
-            ) : (
-                <div>
-                    <LoggedIn/>
-                    <button onClick={logout}></button>
-                </div>
-            )
-        } </div>
-    )
-}
-
-function LogIn({login}) {
-    const init = {
-        username: "",
-        password: ""
-    };
-    const [loginCredentials, setLoginCredentials] = useState(init);
-
-    const performLogin = (evt) => {
-        evt.preventDefault();
-        login(loginCredentials.username, loginCredentials.password);
-    }
-    const onChange = (evt) => {
-        setLoginCredentials({
-            ...loginCredentials,
-            [evt.target.id]: evt.target.value
-        })
-    }
-
-    return (
-        <div>
-            <h2>Login</h2>
-            <form onChange={onChange}>
-                <input placeholder="User Name" id="username"/>
-                <input placeholder="Password" id="password"/>
-                <button onClick={performLogin}>Login</button>
-            </form>
-        </div>
-    )
-
-}
-function LoggedIn() {
-    const [dataFromServer, setDataFromServer] = useState("Loading...")
-
-    useEffect(() => {
-        loginFacade.fetchData().then(data => setDataFromServer(data.msg));
-    }, [])
-
-    return (
-        <div>
-            <h2>Data Received from server</h2>
-            <h3>{dataFromServer}</h3>
-        </div>
-    )
-
-}
 
 function Home() {
     return (
         <h2>Home</h2>
+    )
+}
+
+function ExternData() {
+    const [data, setData] = useState(null);
+    const { strategy } = useParams();
+
+    //const foundData = () => loginFacade.fetchExternData().then(res => setData(res));
+
+    useEffect(() => {
+        setData(null);
+        loginFacade.fetchExternData().then(res => setData(res))
+            .catch(err => {
+                if (err.status) {
+                    console.log(err.message);
+                }
+            });
+
+    }, [])
+
+    const toShow = data ? (
+        <div>
+            <h3>Todo if bored:</h3>
+            <p>Activity: {data.activity}</p>
+            <p>Type: {data.type}</p>
+            <p>Price {data.price}</p>
+            <p>Reference: https://www.boredapi.com/api/activity</p>
+
+            <h3>Random Food picture</h3>
+            <p><img src={data.foodImage}></img></p>
+            <p>Reference: https://foodish-api.herokuapp.com/api</p>
+
+            <h3>Random Dog picture</h3>
+            <p><img src={data.dogPicture}></img></p>
+            <p>Reference: https://dog.ceo/api/breeds/image/random</p>
+
+            <h3>Kanye Says</h3>
+            <em>"{data.kanyeSays}"</em>
+            <p>Reference: https://api.kanye.rest/</p>
+
+            <h3>{data.author} Says</h3>
+            <em>"{data.programmerQuote}"</em>
+            <p>Reference: https://programming-quotes-api.herokuapp.com/quotes/random</p>
+
+        </div>
+    ) : "Loading..."
+
+    return (
+        <div>
+            <h2>data from server</h2>
+            {toShow}
+        </div>
     )
 }
 

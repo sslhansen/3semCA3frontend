@@ -12,6 +12,9 @@ code {
     monospace;
 }
 
+img {
+  width: 250px;
+}
 
 ul.header {
   list-style-type: none;
