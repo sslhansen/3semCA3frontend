@@ -5,11 +5,8 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link,
     NavLink,
     useParams,
-    useRouteMatch,
-    Prompt,
     useLocation,
     useHistory
 } from "react-router-dom";
@@ -18,8 +15,7 @@ import loginFacade from './apiFacade';
 function App() {
     const [isLoggedIn, setLoggedIn] = useState(false)
     let history = useHistory();
-    const setLoginStatus = status => {
-        setLoggedIn(status);
+    const goHome = () => {
         history.push("/");
     }
     return (
@@ -33,7 +29,7 @@ function App() {
                     <Home />
                 </Route>
                 <Route exact path="/login">
-                    <DoLogin loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />
+                    <DoLogin loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} goHome={goHome}/>
                 </Route>
                 <Route exact path="/externData">
                     <ExternData />

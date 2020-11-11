@@ -1,8 +1,8 @@
 import URL from "./settings.js"
 
 function handleHttpErrors(res) {
-    if (! res.ok) {
-        return Promise.reject({status: res.status, fullError: res.json()})
+    if (!res.ok) {
+        return Promise.reject({ status: res.status, fullError: res.json() })
     }
     return res.json();
 }
@@ -33,15 +33,21 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
             setToken(res.token)
         })
     }
-    const fetchDataUser = () => {
+    const fetchData = () => {
         const options = makeOptions("GET", true); // True add's the token
-        return fetch(URL + "/api/info/user", options).then(handleHttpErrors);
+        var base64Url = getToken().split('.')[1];
+        var base64 = base64Url.replace('-', '+').replace('_', '/');
+        if (JSON.parse(atob(base64)).roles === "user") {
+            return fetch(URL + "/api/info/user", options).then(handleHttpErrors);
+        } else {
+            return fetch(URL + "/api/info/admin", options).then(handleHttpErrors);
+        }
+
+        
+        
     }
 
-    const fetchDataAdmin = () => {
-        const options = makeOptions("GET", true); // True add's the token
-        return fetch(URL + "/api/info/admin", options).then(handleHttpErrors);
-    }
+   
     const makeOptions = (method, addToken, body) => {
         var opts = {
             method: method,
@@ -61,7 +67,7 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
 
     const fetchExternData = () => {
         const options = makeOptions("GET", true); // True add's the token
-        return fetch(URL + "/api/info/lol", options).then(handleHttpErrors);
+        return fetch(URL + "/api/info/extern", options).then(handleHttpErrors);
     }
 
 
@@ -72,8 +78,7 @@ function apiFacade() { /* Insert utility-methods from a latter step (d) here (RE
         loggedIn,
         login,
         logout,
-        fetchDataUser,
-        fetchDataAdmin,
+        fetchData,
         fetchExternData
     }
 }

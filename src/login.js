@@ -2,7 +2,7 @@ import loginFacade from "./apiFacade.js"
 import React, { useState, useEffect } from "react";
 
 
-function DoLogin({ loggedIn, setLoggedIn }) {
+function DoLogin({ loggedIn, setLoggedIn, goHome }) {
 
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -11,6 +11,7 @@ function DoLogin({ loggedIn, setLoggedIn }) {
         loginFacade.logout()
         setLoggedIn(false)
         setErrorMsg('')
+        goHome();
     }
 
     const login = (user, pass) => {
@@ -19,8 +20,9 @@ function DoLogin({ loggedIn, setLoggedIn }) {
                 err.fullError.then(e => setErrorMsg(e.message));
             }
         });
-
+        goHome();
     }
+
 
     return (
         <div> {
@@ -71,12 +73,10 @@ function LoggedIn() {
     const [dataFromServer, setDataFromServer] = useState("Loading...")
 
     useEffect(() => {
-        loginFacade.fetchDataUser().then(data => setDataFromServer(data.msg));
+        loginFacade.fetchData().then(data => setDataFromServer(data.msg));
     }, [])
 
-    useEffect(() => {
-        loginFacade.fetchDataAdmin().then(data => setDataFromServer(data.msg));
-    }, [])
+   
 
     return (
         <div>
