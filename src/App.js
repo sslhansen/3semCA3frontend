@@ -29,7 +29,7 @@ function App() {
                     <Home />
                 </Route>
                 <Route exact path="/login">
-                    <DoLogin loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} goHome={goHome}/>
+                    <DoLogin loggedIn={isLoggedIn} setLoggedIn={setLoggedIn} goHome={goHome} />
                 </Route>
                 <Route exact path="/externData">
                     <ExternData />
@@ -65,7 +65,17 @@ function Header({ isLoggedIn, loginMsg }) {
 
 function Home() {
     return (
-        <h2>Home</h2>
+        <div>
+            <h2>Home</h2>
+            <h3>How to use:</h3>
+            <ul>
+                <li>Login as User or Admin using username and password made in backend process</li>
+                <li>User and Admin use different endpoints for login</li>
+                <li><b>Extern API</b> use five different extern REST API endpoints through backend.</li>
+                <li>Make sure to have backend running locally or delpoyet, and adjust link(s) in <b>settings.js</b></li>
+                <li>Link to backend startcode: <a href="https://github.com/sslhansen/3semCA3backend">Backend Startcode</a> </li>
+            </ul>
+        </div>
     )
 }
 
