@@ -1,3 +1,3 @@
-const URL = "http://localhost:8080/jpareststarter";
+const URL = "https://svendbentsballonshow.dk/tomcat/ca3backend";
 
 export default URL;
